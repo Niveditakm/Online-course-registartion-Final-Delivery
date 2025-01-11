@@ -4,11 +4,32 @@ include('includes/config.php');
 if(strlen($_SESSION['alogin'])==0)
     {   
 header('location:index.php');
+}else{
+
+// Code for News Insertion
+if(isset($_POST['submit']))
+{
+$ntitle=$_POST['newstitle'];
+$ndescription=$_POST['description'];
+$ret=mysqli_query($con,"insert into news(newstitle,newsDescription) values('$ntitle','$ndescription')");
+if($ret)
+{
+echo '<script>alert("News added successfully")</script>';
+echo "<script>window.location.href='news.php'</script>";
+}else {
+echo '<script>alert("Something went wrong. Please try again.")</script>';
+echo "<script>window.location.href='news.php'</script>";
 }
-else{
+}
 
-
-
+//Code Deletion
+if(isset($_GET['del']))
+{
+$nid=$_GET['id'];    
+mysqli_query($con,"delete from news where id ='$nid'");
+echo '<script>alert("News deleted succesfully.")</script>';
+echo '<script>window.location.href=news.php</script>';
+}
 ?>
 
 <!DOCTYPE html>
@@ -18,7 +39,7 @@ else{
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>Enroll History</title>
+    <title>Admin | News</title>
     <link href="../assets/css/bootstrap.css" rel="stylesheet" />
     <link href="../assets/css/font-awesome.css" rel="stylesheet" />
     <link href="../assets/css/style.css" rel="stylesheet" />
@@ -37,16 +58,42 @@ else{
         <div class="container">
               <div class="row">
                     <div class="col-md-12">
-                        <h1 class="page-head-line">Enroll History  </h1>
+                        <h1 class="page-head-line">News  </h1>
                     </div>
                 </div>
                 <div class="row" >
-            
+                  <div class="col-md-3"></div>
+                    <div class="col-md-6">
+                        <div class="panel panel-default">
+                        <div class="panel-heading">
+                           News 
+                        </div>
+
+
+
+                        <div class="panel-body">
+                       <form name="dept" method="post">
+   <div class="form-group">
+    <label for="department">News Title </label>
+    <input type="text" class="form-control" id="newstitle" name="newstitle" placeholder="News Title" required />
+  </div>
+
+     <div class="form-group">
+    <label for="department">News description </label>
+    <textarea class="form-control" id="description" name="description" placeholder="News Description" required></textarea>
+  </div>
+ <button type="submit" name="submit" class="btn btn-default">Submit</button>
+</form>
+                            </div>
+                            </div>
+                    </div>
+                  
+                </div>
                 <div class="col-md-12">
                     <!--    Bordered Table  -->
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                           Enroll History
+                            Manage Session
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
@@ -55,19 +102,15 @@ else{
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                                 <th>Student Name </th>
-                                                    <th>Student Reg no </th>
-                                            <th>Course Name </th>
-                                            <th>Session </th>
-                                            
-                                                <th>Semester</th>
-                                             <th>Enrollment Date</th>
-                                             <th>Action</th>
+                                            <th>News Title</th>
+                                            <th>News Description</th>
+                                            <th>Creation Date</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
 <?php
-$sql=mysqli_query($con,"select courseenrolls.course as cid, course.courseName as courname,session.session as session,department.department as dept,courseenrolls.enrollDate as edate ,semester.semester as sem,students.studentName as sname,students.StudentRegno as sregno from courseenrolls join course on course.id=courseenrolls.course join session on session.id=courseenrolls.session join department on department.id=courseenrolls.department   join semester on semester.id=courseenrolls.semester join students on students.StudentRegno=courseenrolls.studentRegno ");
+$sql=mysqli_query($con,"select * from news");
 $cnt=1;
 while($row=mysqli_fetch_array($sql))
 {
@@ -76,18 +119,13 @@ while($row=mysqli_fetch_array($sql))
 
                                         <tr>
                                             <td><?php echo $cnt;?></td>
-                                              <td><?php echo htmlentities($row['sname']);?></td>
-                                            <td><?php echo htmlentities($row['sregno']);?></td>
-                                            <td><?php echo htmlentities($row['courname']);?></td>
-                                            <td><?php echo htmlentities($row['dept']);?></td>
-                                          
-                                            <td><?php echo htmlentities($row['sem']);?></td>
-                                             <td><?php echo htmlentities($row['edate']);?></td>
+                                            <td><?php echo htmlentities($row['newstitle']);?></td>
+                                            <td><?php echo htmlentities($row['newsDescription']);?></td>
+                                            <td><?php echo htmlentities($row['postingDate']);?></td>
                                             <td>
-                                            <a href="print.php?id=<?php echo $row['cid']?>" target="_blank">
-<button class="btn btn-primary"><i class="fa fa-print "></i> Print</button> </a>                                        
-
-
+  <a href="news.php?id=<?php echo $row['id']?>&del=delete" onClick="return confirm('Are you sure you want to delete?')">
+                                            <button class="btn btn-danger">Delete</button>
+</a>
                                             </td>
                                         </tr>
 <?php 
@@ -111,7 +149,7 @@ $cnt++;
         </div>
     </div>
     <!-- CONTENT-WRAPPER SECTION END-->
-  <?php include('includes/footer.php');?>
+  <?php include('../includes/footer.php');?>
     <!-- FOOTER SECTION END-->
     <!-- JAVASCRIPT AT THE BOTTOM TO REDUCE THE LOADING TIME  -->
     <!-- CORE JQUERY SCRIPTS -->

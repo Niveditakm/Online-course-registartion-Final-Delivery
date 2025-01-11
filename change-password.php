@@ -2,8 +2,7 @@
 <?php
 session_start();
 include('includes/config.php');
-error_reporting(0);
-if(strlen($_SESSION['login'])==0)
+if(strlen($_SESSION['alogin'])==0)
     {   
 header('location:index.php');
 }
@@ -11,21 +10,18 @@ else{
 date_default_timezone_set('Asia/Kolkata');// change according timezone
 $currentTime = date( 'd-m-Y h:i:s A', time () );
 
-//Code for Change Password
+
 if(isset($_POST['submit']))
-{ 
-$regno=$_SESSION['login'];   
-$currentpass=md5($_POST['cpass']);
-$newpass=md5($_POST['newpass']);
-$sql=mysqli_query($con,"SELECT password FROM  students where password='$currentpass' && studentRegno='$regno'");
+{
+$sql=mysqli_query($con,"SELECT password FROM  admin where password='".md5($_POST['cpass'])."' && username='".$_SESSION['alogin']."'");
 $num=mysqli_fetch_array($sql);
 if($num>0)
 {
- $con=mysqli_query($con,"update students set password='$newpass', updationDate='$currentTime' where studentRegno='$regno'");
+ $con=mysqli_query($con,"update admin set password='".md5($_POST['newpass'])."', updationDate='$currentTime' where username='".$_SESSION['alogin']."'");
 echo '<script>alert("Password Changed Successfully !!")</script>';
 echo '<script>window.location.href=change-password.php</script>';
-}else{
-echo '<script>alert("Current Password not match !!")</script>';
+}else {
+echo '<script>alert("Old Password not match !!")</script>';
 echo '<script>window.location.href=change-password.php</script>';
 }
 }
@@ -35,13 +31,10 @@ echo '<script>window.location.href=change-password.php</script>';
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="" />
-    <meta name="author" content="" />
-    <title>Student | Student Password</title>
-    <link href="assets/css/bootstrap.css" rel="stylesheet" />
-    <link href="assets/css/font-awesome.css" rel="stylesheet" />
-    <link href="assets/css/style.css" rel="stylesheet" />
+    <title>Admin | Change Password</title>
+    <link href="../assets/css/bootstrap.css" rel="stylesheet" />
+    <link href="../assets/css/font-awesome.css" rel="stylesheet" />
+    <link href="../assets/css/style.css" rel="stylesheet" />
 </head>
 <script type="text/javascript">
 function valid()
@@ -76,7 +69,7 @@ return true;
 <body>
 <?php include('includes/header.php');?>
     <!-- LOGO HEADER END-->
-<?php if($_SESSION['login']!="")
+<?php if($_SESSION['alogin']!="")
 {
  include('includes/menubar.php');
 }
@@ -86,7 +79,7 @@ return true;
         <div class="container">
               <div class="row">
                     <div class="col-md-12">
-                        <h1 class="page-head-line">Student Change Password </h1>
+                        <h1 class="page-head-line">Admin Change Password </h1>
                     </div>
                 </div>
                 <div class="row" >
@@ -133,9 +126,9 @@ return true;
     <!-- FOOTER SECTION END-->
     <!-- JAVASCRIPT AT THE BOTTOM TO REDUCE THE LOADING TIME  -->
     <!-- CORE JQUERY SCRIPTS -->
-    <script src="assets/js/jquery-1.11.1.js"></script>
+    <script src="../assets/js/jquery-1.11.1.js"></script>
     <!-- BOOTSTRAP SCRIPTS  -->
-    <script src="assets/js/bootstrap.js"></script>
+    <script src="../assets/js/bootstrap.js"></script>
 </body>
 </html>
 <?php } ?>
